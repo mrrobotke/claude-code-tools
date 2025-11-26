@@ -1,0 +1,15 @@
+todos/
+statsig/
+.claude
+file-history/
+ide/
+plans/
+plugins/
+projects/
+session-env/
+shell-snapshots/
+debug/
+.update.lock
+CLAUDE.MD
+history.jsonl
+settings.json.pre-atomic
