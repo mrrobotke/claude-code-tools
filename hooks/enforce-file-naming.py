@@ -33,9 +33,13 @@ ALLOWED_DIRECTORIES = [
     '/Users/antonyngigge/Ignixxion/ignixxion-apps/IgnixxionNestAPI/test/',
     '/Users/antonyngigge/Ignixxion/ignixxion-apps/IgnixxionNestAPI/prisma/',
     '/Users/antonyngigge/Ignixxion/ignixxion-apps/IgnixxionNestAPI/migration_docs/',
+    '/Users/antonyngigge/iworldAfric/Bidding/bidzetu-backend/',
+    '/Users/antonyngigge/iworldAfric/iJobs/iJobs-frontend/',
+    '/Users/antonyngigge/iworldAfric/iJobs/iJobs-backend/',
     '/Users/antonyngigge/.claude/agents/',
     '/Users/antonyngigge/.claude/hooks/',
     '/Users/antonyngigge/.claude/commands/',
+    '/Users/antonyngigge/.claude/projects/',
 ]
 
 def validate_file_path(file_path):

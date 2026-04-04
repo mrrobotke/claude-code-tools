@@ -1,25 +1,36 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "SEMGREP_APP_TOKEN": "d68abd88c64e21387631d15325b2d5cfd6ad6a0887eeeaf4479094bedc542ed0",
+    "CLAUDE_CODE_EFFORT_LEVEL": "max",
+    "CLAUDE_CODE_NEW_INIT": "1"
+  },
+  "attribution": {},
   "permissions": {
     "allow": [
-      "Read(.*)",
-      "Grep(.*)",
-      "Glob(.*)",
-      "Write(.*)",
+      "Bash(.*)",
+      "Bash(yarn *)",
       "Edit(.*)",
+      "Glob(.*)",
+      "Grep(.*)",
       "MultiEdit(.*)",
-      "TodoWrite(.*)",
-      "Task(.*)",
-      "Bash(.:*)",
-      "SlashCommand(.*)",
+      "NotebookEdit(.*)",
       "NotebookRead(.*)",
-      "NotebookEdit(.*)"
+      "Read(.*)",
+      "SlashCommand(.*)",
+      "Task(.*)",
+      "TodoWrite(.*)",
+      "Write(.*)"
     ],
     "deny": [
       "Bash\\(.*rm(\\s|-).*\\)",
       "Bash\\(.*shutdown.*\\)",
-      "Bash\\(.*reboot.*\\)"
+      "Bash\\(.*reboot.*\\)",
+      "Bash\\(.*git checkout(?! -b).*\\)",
+      "Bash\\(.*git switch(?! -c).*\\)"
     ],
+    "defaultMode": "bypassPermissions",
     "requireApproval": [
       "Bash(git commit*)",
       "Bash(gh pr create*)",
@@ -31,7 +42,12 @@
   "hooks": {
     "SessionStart": [
       {
-        "hooks": []
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/worktree-branch-awareness.sh"
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
@@ -50,6 +66,22 @@
             "command": "~/.claude/hooks/atomic-context-injector.py"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/worktree-enforcement-context.sh"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/worktree-dashboard.sh"
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -59,6 +91,15 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/git-security-enforcer.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/supabase-safety.sh"
           }
         ]
       },
@@ -106,6 +147,51 @@
             "command": "~/.claude/hooks/atomic-boundary-checker.py"
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/prevent-main-branch-edits.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Task|Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/enforce-worktree-on-spawn.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Task|Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/branch-collision-guard.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/validate-commit-target.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/validate-push-target.sh"
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -126,21 +212,87 @@
             "command": "~/.claude/hooks/atomic-test-validator.sh"
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/lint-on-edit.sh"
+          }
+        ]
       }
     ],
-    "Stop": [],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/stop-uncommitted-guard.sh"
+          }
+        ]
+      }
+    ],
     "SessionEnd": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hookslog-session-metrics.py"
+            "command": "~/.claude/hooks/log-session-metrics.py"
           }
         ]
       }
     ]
   },
+  "enabledPlugins": {
+    "pyright-lsp@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "supabase@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "stripe@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true,
+    "hookify@claude-plugins-official": true,
+    "serena@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "sentry@claude-plugins-official": true,
+    "vercel@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "ralph-wiggum@claude-plugins-official": true,
+    "linear@claude-plugins-official": true,
+    "greptile@claude-plugins-official": true,
+    "ralph-loop@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "agent-sdk-dev@claude-plugins-official": true,
+    "plugin-dev@claude-plugins-official": true,
+    "claude-code-setup@claude-plugins-official": true,
+    "swift-lsp@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "qodo-skills@claude-plugins-official": true,
+    "semgrep@claude-plugins-official": false,
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "coderabbit@claude-plugins-official": true,
+    "postman@claude-plugins-official": true,
+    "chrome-devtools-mcp@claude-plugins-official": true,
+    "atomic-design-suite@local-plugins": true,
+    "imessage@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "local-plugins": {
+      "source": {
+        "source": "directory",
+        "path": "/Users/antonyngigge/.claude/local-plugins"
+      }
+    }
+  },
   "alwaysThinkingEnabled": true,
+  "skipDangerousModePermissionPrompt": true,
+  "teammatemode": "iterm2",
   "feedbackSurveyState": {
     "lastShownTime": 1754067067452
   }
