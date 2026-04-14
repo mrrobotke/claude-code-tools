@@ -1,5 +1,4 @@
 {
-  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "SEMGREP_APP_TOKEN": "d68abd88c64e21387631d15325b2d5cfd6ad6a0887eeeaf4479094bedc542ed0",
@@ -7,40 +6,47 @@
     "CLAUDE_CODE_NEW_INIT": "1"
   },
   "attribution": {
-    "commit":"",
-    "pr":""
-},
+    "commit": "",
+    "pr": ""
+  },
   "permissions": {
     "allow": [
-      "Bash(.*)",
-      "Bash(yarn *)",
-      "Edit(.*)",
-      "Glob(.*)",
-      "Grep(.*)",
-      "MultiEdit(.*)",
-      "NotebookEdit(.*)",
-      "NotebookRead(.*)",
-      "Read(.*)",
-      "SlashCommand(.*)",
-      "Task(.*)",
-      "TodoWrite(.*)",
-      "Write(.*)"
+      "mcp__plugin_serena_serena__get_current_config",
+      "mcp__plugin_serena_serena__activate_project",
+      "mcp__plugin_serena_serena__check_onboarding_performed",
+      "mcp__plugin_serena_serena__onboarding",
+      "mcp__plugin_serena_serena__list_dir",
+      "mcp__plugin_serena_serena__read_file",
+      "mcp__plugin_serena_serena__search_for_pattern",
+      "mcp__plugin_serena_serena__write_memory",
+      "mcp__plugin_serena_serena__list_memories",
+      "mcp__plugin_serena_serena__read_memory",
+      "WebFetch(domain:github.com)",
+      "mcp__plugin_serena_serena__find_symbol",
+      "mcp__plugin_serena_serena__replace_content",
+      "mcp__plugin_serena_serena__insert_after_symbol",
+      "mcp__plugin_serena_serena__create_text_file",
+      "mcp__plugin_serena_serena__think_about_collected_information",
+      "Bash(poetry run ruff:*)",
+      "Bash(poetry run mypy:*)",
+      "Bash(.venv/bin/mypy:*)",
+      "Bash(poetry install:*)",
+      "Bash(poetry run pytest:*)",
+      "Bash(ls:*)",
+      "Bash(set -a)",
+      "Bash(source .env)",
+      "Bash(set +a)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)",
+      "Bash(pnpm *)",
+      "Bash(pnpm run *)",
+      "Bash(pnpm test*)",
+      "Bash(pnpm install*)",
+      "mcp__plugin_serena_serena__think_about_task_adherence"
     ],
-    "deny": [
-      "Bash\\(.*rm(\\s|-).*\\)",
-      "Bash\\(.*shutdown.*\\)",
-      "Bash\\(.*reboot.*\\)",
-      "Bash\\(.*git checkout(?! -b).*\\)",
-      "Bash\\(.*git switch(?! -c).*\\)"
-    ],
-    "defaultMode": "bypassPermissions",
-    "requireApproval": [
-      "Bash(git commit*)",
-      "Bash(gh pr create*)",
-      "Bash(git checkout -b*)",
-      "Bash(git merge*)",
-      "Bash(git push*)"
-    ]
+    "defaultMode": "bypassPermissions"
   },
   "hooks": {
     "SessionStart": [
@@ -48,7 +54,15 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/worktree-branch-awareness.sh"
+            "command": "/Users/antonyngigge/.claude/hooks/inject-monitor-context.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/worktree-branch-awareness.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/serena-init.sh"
           }
         ]
       }
@@ -58,50 +72,101 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/comment-guidelines-context.py"
-          }
-        ]
-      },
-      {
-        "hooks": [
+            "command": "/Users/antonyngigge/.claude/hooks/inject-serena-context.sh"
+          },
           {
             "type": "command",
-            "command": "~/.claude/hooks/atomic-context-injector.py"
-          }
-        ]
-      },
-      {
-        "hooks": [
+            "command": "/Users/antonyngigge/.claude/hooks/dual-agent-detect.sh"
+          },
           {
             "type": "command",
-            "command": "~/.claude/hooks/worktree-enforcement-context.sh"
-          }
-        ]
-      },
-      {
-        "hooks": [
+            "command": "/Users/antonyngigge/.claude/hooks/ralph-detector.sh"
+          },
           {
             "type": "command",
-            "command": "~/.claude/hooks/worktree-dashboard.sh"
-          }
-        ]
-      },
-      {
-        "hooks": [
+            "command": "/Users/antonyngigge/.claude/hooks/inject-coding-rules.sh"
+          },
           {
             "type": "command",
-            "command": "~/.claude/hooks/serena-context-injector.sh"
+            "command": "/Users/antonyngigge/.claude/hooks/inject-ui-test-credentials.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/atomic-context-injector.py"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/worktree-dashboard.sh"
           }
         ]
       }
     ],
     "PreToolUse": [
       {
-        "matcher": "Bash",
+        "matcher": "Read|Glob|Grep",
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/git-security-enforcer.sh"
+            "command": "/Users/antonyngigge/.claude/hooks/redirect-to-serena.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/redirect-write-to-serena.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/protect-sensitive.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/block-edits-on-base-branches.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/enforce-file-naming.py"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/atomic-structure-validator.py"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/atomic-boundary-checker.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__plugin_serena_serena__replace_content|mcp__plugin_serena_serena__replace_symbol_body|mcp__plugin_serena_serena__create_text_file|mcp__plugin_serena_serena__insert_before_symbol|mcp__plugin_serena_serena__insert_after_symbol|mcp__plugin_serena_serena__rename_symbol|mcp__plugin_serena_serena__safe_delete_symbol",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/serena-protect-sensitive.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/serena-block-base-branch.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Task|Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/serena-agent-activation.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/enforce-worktree-on-spawn.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/branch-collision-guard.sh"
           }
         ]
       },
@@ -110,7 +175,23 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/supabase-safety.sh"
+            "command": "/Users/antonyngigge/.claude/hooks/git-security-enforcer.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/inject-commit-rules.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/validate-commit-msg.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/validate-push-target.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/validate-commit-target.sh"
           }
         ]
       },
@@ -119,7 +200,23 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/git-commit-validator.sh"
+            "command": "/Users/antonyngigge/.claude/hooks/block-branch-in-main-worktree.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/block-prisma-db-push.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/supabase-safety.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/block-hook-bypass.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/log-commands.sh"
           }
         ]
       },
@@ -128,117 +225,61 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/enforce-coverage.py"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/enforce-file-naming.py"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/atomic-structure-validator.py"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/atomic-boundary-checker.py"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/prevent-main-branch-edits.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/serena-edit-enforcer.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Task|Agent",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/enforce-worktree-on-spawn.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Task|Agent",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/branch-collision-guard.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/validate-commit-target.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/validate-push-target.sh"
+            "command": "/Users/antonyngigge/.claude/hooks/enforce-coverage.py"
           }
         ]
       }
     ],
     "PostToolUse": [
       {
-        "matcher": "Edit|Write|MultiEdit|mcp__plugin_serena_serena__(replace_content|replace_symbol_body|insert_after_symbol|insert_before_symbol|create_text_file|rename_symbol|safe_delete_symbol)",
+        "matcher": "mcp__plugin_serena_serena__activate_project",
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/format-typescript.sh"
+            "command": "/Users/antonyngigge/.claude/hooks/serena-track-project.sh"
           }
         ]
       },
       {
-        "matcher": "Write|Edit|mcp__plugin_serena_serena__(replace_content|replace_symbol_body|insert_after_symbol|insert_before_symbol|create_text_file|rename_symbol|safe_delete_symbol)",
+        "matcher": "Edit|Write",
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/atomic-test-validator.sh"
+            "command": "/Users/antonyngigge/.claude/hooks/auto-format.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/auto-ci.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/atomic-test-validator.sh"
           }
         ]
       },
       {
-        "matcher": "Edit|Write|MultiEdit|mcp__plugin_serena_serena__(replace_content|replace_symbol_body|insert_after_symbol|insert_before_symbol|create_text_file|rename_symbol|safe_delete_symbol)",
+        "matcher": "mcp__plugin_serena_serena__replace_content|mcp__plugin_serena_serena__replace_symbol_body|mcp__plugin_serena_serena__create_text_file|mcp__plugin_serena_serena__insert_before_symbol|mcp__plugin_serena_serena__insert_after_symbol|mcp__plugin_serena_serena__rename_symbol|mcp__plugin_serena_serena__safe_delete_symbol",
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/lint-on-edit.sh"
+            "command": "/Users/antonyngigge/.claude/hooks/serena-auto-format.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/serena-auto-ci.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/atomic-test-validator.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__plugin_serena_serena__read_file|mcp__plugin_serena_serena__replace_content|mcp__plugin_serena_serena__replace_symbol_body|mcp__plugin_serena_serena__create_text_file|mcp__plugin_serena_serena__insert_before_symbol|mcp__plugin_serena_serena__insert_after_symbol|mcp__plugin_serena_serena__rename_symbol|mcp__plugin_serena_serena__safe_delete_symbol|mcp__plugin_serena_serena__find_file|mcp__plugin_serena_serena__search_for_pattern|mcp__plugin_serena_serena__find_symbol|mcp__plugin_serena_serena__get_symbols_overview",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/antonyngigge/.claude/hooks/serena-log-operations.sh"
           }
         ]
       }
@@ -248,60 +289,70 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/stop-uncommitted-guard.sh"
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
+            "command": "/Users/antonyngigge/.claude/hooks/block-dirty-worktree-stop.sh"
+          },
           {
             "type": "command",
-            "command": "~/.claude/hooks/log-session-metrics.py"
+            "command": "/Users/antonyngigge/.claude/hooks/quality-gate-stop.sh"
           }
         ]
       }
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "/Users/antonyngigge/.claude/scripts/status-line.sh",
+    "refreshInterval": 30
+  },
   "enabledPlugins": {
-    "pyright-lsp@claude-plugins-official": true,
-    "github@claude-plugins-official": true,
+    "agent-sdk-dev@claude-code-plugins": true,
+    "code-review@claude-code-plugins": true,
+    "feature-dev@claude-code-plugins": true,
+    "frontend-design@claude-code-plugins": true,
+    "hookify@claude-code-plugins": true,
+    "ralph-wiggum@claude-code-plugins": true,
     "frontend-design@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
     "feature-dev@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
     "supabase@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
-    "stripe@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true,
-    "security-guidance@claude-plugins-official": true,
-    "hookify@claude-plugins-official": true,
-    "serena@claude-plugins-official": true,
-    "pr-review-toolkit@claude-plugins-official": true,
-    "sentry@claude-plugins-official": true,
-    "vercel@claude-plugins-official": true,
-    "code-review@claude-plugins-official": true,
-    "ralph-wiggum@claude-plugins-official": true,
-    "linear@claude-plugins-official": true,
-    "greptile@claude-plugins-official": true,
-    "ralph-loop@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true,
-    "playwright@claude-plugins-official": true,
-    "claude-md-management@claude-plugins-official": true,
     "agent-sdk-dev@claude-plugins-official": true,
-    "plugin-dev@claude-plugins-official": true,
-    "claude-code-setup@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "hookify@claude-plugins-official": true,
+    "sentry@claude-plugins-official": true,
+    "greptile@claude-plugins-official": true,
+    "vercel@claude-plugins-official": true,
+    "stripe@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "security-guidance@claude-code-plugins": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "serena@claude-plugins-official": true,
     "swift-lsp@claude-plugins-official": true,
+    "commit-commands@claude-code-plugins": true,
+    "pr-review-toolkit@claude-code-plugins": true,
+    "security-guidance@claude-plugins-official": true,
+    "ralph-loop@claude-plugins-official": true,
+    "claude-code-setup@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
-    "qodo-skills@claude-plugins-official": true,
-    "semgrep@claude-plugins-official": false,
-    "rust-analyzer-lsp@claude-plugins-official": true,
+    "plugin-dev@claude-plugins-official": true,
+    "linear@claude-plugins-official": true,
     "coderabbit@claude-plugins-official": true,
-    "postman@claude-plugins-official": true,
+    "firecrawl@claude-plugins-official": true,
+    "semgrep@claude-plugins-official": false,
+    "sonatype-guide@claude-plugins-official": true,
+    "pagerduty@claude-plugins-official": true,
+    "atomic-agents@claude-plugins-official": true,
+    "autofix-bot@claude-plugins-official": true,
     "chrome-devtools-mcp@claude-plugins-official": true,
-    "atomic-design-suite@local-plugins": true,
-    "imessage@claude-plugins-official": true,
-    "codex@openai-codex": true
+    "sourcegraph@claude-plugins-official": true,
+    "terraform@claude-plugins-official": true,
+    "phase-handoff@local": true,
+    "codex@openai-codex": true,
+    "claude-md-management@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "local-plugins": {
@@ -318,9 +369,11 @@
     }
   },
   "alwaysThinkingEnabled": true,
+  "voiceEnabled": true,
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
   "skipDangerousModePermissionPrompt": true,
-  "teammatemode": "iterm2",
-  "feedbackSurveyState": {
-    "lastShownTime": 1754067067452
-  }
+  "teammatemode": "iterm2"
 }

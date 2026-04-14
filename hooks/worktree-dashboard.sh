@@ -18,7 +18,9 @@ if [[ "$git_dir" == *"/worktrees/"* ]]; then
 fi
 
 worktree_lines=$(git worktree list 2>/dev/null | tail -n +2)
-worktree_count=$(echo "$worktree_lines" | grep -c '.' 2>/dev/null || echo "0")
+worktree_count=$(echo "$worktree_lines" | grep -c '.' 2>/dev/null || true)
+worktree_count=$(echo "$worktree_count" | tr -d '[:space:]')
+[[ -z "$worktree_count" ]] && worktree_count=0
 
 if [[ "$worktree_count" -eq 0 ]]; then
   exit 0

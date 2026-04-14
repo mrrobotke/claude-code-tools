@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-# Block code-writing agents spawned without isolation: "worktree".
-# WHY agents without worktree isolation land in the main checkout and cause
-# cross-pollination when they edit files on the wrong branch.
+# Inject git worktree instructions into code-writing agent prompts.
+# WHY agents must create and work from isolated git worktrees to prevent
+# cross-pollination. Using `git worktree add` keeps branches isolated and
+# avoids the cleanup issues of `isolation: "worktree"` which can pollute
+# the main checkout when agents terminate.
 
 set -euo pipefail
 
@@ -15,11 +17,10 @@ case "$tool_name" in
   *) exit 0 ;;
 esac
 
-isolation=$(echo "$input" | jq -r '.tool_input.isolation // empty')
 prompt=$(echo "$input" | jq -r '.tool_input.prompt // empty')
 subagent_type=$(echo "$input" | jq -r '.tool_input.subagent_type // empty')
 
-# Read-only agent types never need worktree isolation.
+# Read-only agent types do not need worktree instructions.
 readonly_types=(
   "feature-dev:code-reviewer"
   "feature-dev:code-explorer"
@@ -43,42 +44,33 @@ for ro_type in "${readonly_types[@]}"; do
   fi
 done
 
-# If isolation is already set to worktree, allow.
-if [[ "$isolation" == "worktree" ]]; then
-  exit 0
-fi
-
 # Scan prompt for mutation verbs that indicate code-writing intent.
 mutation_pattern='\b(fix|implement|edit|create file|write code|modify|apply patch|refactor|update code|commit and push|make changes|add export|remove dead|replace|change the|add.*to|apply.*fixes|rewrite)\b'
 
 if echo "$prompt" | grep -iqE "$mutation_pattern"; then
-  cat >&2 <<EOF
+  # Check if prompt already mentions worktree add
+  if echo "$prompt" | grep -qi "worktree add"; then
+    exit 0
+  fi
 
-Agent spawn BLOCKED — missing worktree isolation.
+  cat <<'EOF'
+WORKTREE ISOLATION REQUIRED FOR THIS AGENT:
 
-The prompt contains code-mutation intent but isolation: "worktree" is not set.
-All code-writing agents MUST be spawned with isolation: "worktree" to prevent
-cross-pollination between branches.
+This agent will write code. It MUST work from an isolated git worktree.
 
-Add isolation: "worktree" to the Task/Agent call:
-  Agent({
-    ...
-    isolation: "worktree",
-    ...
-  })
+BEFORE any code changes, the agent must:
+  1. Create a worktree: git worktree add ../worktrees/<branch-name> -b <branch-name>
+  2. cd into the worktree: cd ../worktrees/<branch-name>
+  3. Run ALL commands from the worktree directory
+  4. Commit and push from the worktree: git push -u origin <branch-name>
 
-Read-only agents (reviewers, explorers, planners) do not need isolation.
+NEVER create branches with git checkout -b or git switch -c in the main worktree.
+NEVER edit files in the main worktree directly.
+
+The agent prompt MUST include the target branch name and worktree setup as
+the FIRST action before any file operations.
 EOF
-
-  cat <<EOF
-{
-  "hookSpecificOutput": {
-    "permissionDecision": "deny",
-    "permissionDecisionReason": "Code-writing agent must be spawned with isolation: 'worktree'. Prompt contains mutation keywords but isolation is not set."
-  }
-}
-EOF
-  exit 2
+  exit 0
 fi
 
 # No mutation keywords detected — allow (likely a reviewer or coordinator).
