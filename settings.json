@@ -6,7 +6,10 @@
     "CLAUDE_CODE_EFFORT_LEVEL": "max",
     "CLAUDE_CODE_NEW_INIT": "1"
   },
-  "attribution": {},
+  "attribution": {
+    "commit":"",
+    "pr":""
+},
   "permissions": {
     "allow": [
       "Bash(.*)",
@@ -80,6 +83,14 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/worktree-dashboard.sh"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/serena-context-injector.sh"
           }
         ]
       }
@@ -158,6 +169,15 @@
         ]
       },
       {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/serena-edit-enforcer.sh"
+          }
+        ]
+      },
+      {
         "matcher": "Task|Agent",
         "hooks": [
           {
@@ -196,7 +216,7 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Edit|Write|MultiEdit",
+        "matcher": "Edit|Write|MultiEdit|mcp__plugin_serena_serena__(replace_content|replace_symbol_body|insert_after_symbol|insert_before_symbol|create_text_file|rename_symbol|safe_delete_symbol)",
         "hooks": [
           {
             "type": "command",
@@ -205,7 +225,7 @@
         ]
       },
       {
-        "matcher": "Write|Edit",
+        "matcher": "Write|Edit|mcp__plugin_serena_serena__(replace_content|replace_symbol_body|insert_after_symbol|insert_before_symbol|create_text_file|rename_symbol|safe_delete_symbol)",
         "hooks": [
           {
             "type": "command",
@@ -214,7 +234,7 @@
         ]
       },
       {
-        "matcher": "Edit|Write|MultiEdit",
+        "matcher": "Edit|Write|MultiEdit|mcp__plugin_serena_serena__(replace_content|replace_symbol_body|insert_after_symbol|insert_before_symbol|create_text_file|rename_symbol|safe_delete_symbol)",
         "hooks": [
           {
             "type": "command",
@@ -280,13 +300,20 @@
     "postman@claude-plugins-official": true,
     "chrome-devtools-mcp@claude-plugins-official": true,
     "atomic-design-suite@local-plugins": true,
-    "imessage@claude-plugins-official": true
+    "imessage@claude-plugins-official": true,
+    "codex@openai-codex": true
   },
   "extraKnownMarketplaces": {
     "local-plugins": {
       "source": {
         "source": "directory",
         "path": "/Users/antonyngigge/.claude/local-plugins"
+      }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
       }
     }
   },

@@ -1,11 +1,46 @@
 #!/bin/bash
-# PostToolUse hook: Auto-lint files after Edit/Write/MultiEdit
+# PostToolUse hook: Auto-lint files after Edit/Write/MultiEdit or Serena edits.
 # Global hook — detects project linter and runs it on changed files.
 
-INPUT=$(cat)
-FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty' 2>/dev/null)
+set -euo pipefail
 
-[ -z "$FILE_PATH" ] || [ ! -f "$FILE_PATH" ] && exit 0
+# Resolve file path from native tools (file_path) or Serena tools (relative_path).
+resolve_file_path() {
+  local fp rp git_root found
+
+  fp=$(echo "$1" | jq -r '.tool_input.file_path // empty' 2>/dev/null)
+  if [[ -n "$fp" ]] && [[ -f "$fp" ]]; then
+    echo "$fp"
+    return
+  fi
+
+  rp=$(echo "$1" | jq -r '.tool_input.relative_path // empty' 2>/dev/null)
+  if [[ -z "$rp" ]]; then
+    return
+  fi
+
+  if [[ -f "$rp" ]]; then
+    realpath "$rp" 2>/dev/null && return
+  fi
+
+  git_root=$(git rev-parse --show-toplevel 2>/dev/null) || return
+  if [[ -f "$git_root/$rp" ]]; then
+    echo "$git_root/$rp"
+    return
+  fi
+
+  found=$(find "$git_root" -path "*/$rp" -type f 2>/dev/null | head -1)
+  if [[ -n "$found" ]]; then
+    echo "$found"
+    return
+  fi
+}
+
+INPUT=$(cat)
+FILE_PATH=$(resolve_file_path "$INPUT")
+
+[ -z "$FILE_PATH" ] && exit 0
+[ ! -f "$FILE_PATH" ] && exit 0
 
 # Find project root (nearest package.json or pyproject.toml).
 find_root() {
