@@ -342,7 +342,7 @@
     "linear@claude-plugins-official": true,
     "coderabbit@claude-plugins-official": true,
     "firecrawl@claude-plugins-official": true,
-    "semgrep@claude-plugins-official": false,
+    "semgrep@claude-plugins-official": true,
     "sonatype-guide@claude-plugins-official": true,
     "pagerduty@claude-plugins-official": true,
     "atomic-agents@claude-plugins-official": true,
@@ -365,6 +365,12 @@
       "source": {
         "source": "github",
         "repo": "openai/codex-plugin-cc"
+      }
+    },
+    "claude-code-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-code"
       }
     }
   },
